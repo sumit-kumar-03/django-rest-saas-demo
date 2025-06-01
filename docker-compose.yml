@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  saas_db:
+    image: postgres:13
+    volumes:
+      - saas_postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: saas_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    expose:
+      - 5432
+
+
+  saas_app:
+    build: .
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 saas_project.wsgi:application"
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8000"
+    depends_on:
+      - saas_db
+
+
+
+volumes:
+  postgres_data:
+    driver: local
+
+  
+
+networks:
+  default:
+    driver: bridge
