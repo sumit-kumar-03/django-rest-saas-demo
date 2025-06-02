@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   saas_db:
-    image: postgres:13
+    image: postgres:14
+    container_name: saas_db
     volumes:
       - saas_postgres_data:/var/lib/postgresql/data/
     environment:
@@ -11,25 +12,53 @@ services:
       POSTGRES_PASSWORD: postgres
     expose:
       - 5432
+    restart: unless-stopped
+
+  saas_mq:
+    image: rabbitmq:3-management
+    container_name: saas_mq
+    env_file:
+      - dev.env
+    expose:
+      - 5672
+      - 15672
+    volumes:
+      - saas_rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
 
 
   saas_app:
     build: .
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
-             gunicorn --bind 0.0.0.0:8000 saas_project.wsgi:application"
+    entrypoint: [
+        "sh",
+        "/app/scripts/start_server.sh"
+        ]
     volumes:
       - .:/app
     ports:
       - "8001:8000"
     depends_on:
       - saas_db
+    restart: unless-stopped
+
+
+  saas_worker:
+    build: .
+    entrypoint: [
+        "sh",
+        "/app/scripts/start_workers.sh"
+        ]
+    volumes:
+      - .:/app
+    restart: unless-stopped
 
 
 
 volumes:
-  postgres_data:
+  saas_postgres_data:
+    driver: local
+
+  saas_rabbitmq_data:
     driver: local
 
   

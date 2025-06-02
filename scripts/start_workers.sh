@@ -1,0 +1,2 @@
+#!/bin/bash
+celery --app=app.celery.celery.saas_project_celery_app worker --queues=sheduled_tasks --without-gossip --concurrency=4 --loglevel=INFO --without-mingle --without-heartbeat -Ofair --hostname=beat_worker@%h --max-tasks-per-child=1000

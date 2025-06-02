@@ -11,33 +11,17 @@ SECRET_KEY = os.getenv(
     "SECRET_KEY",
     "sumit",
 )
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 
 
-## Base settings
-DEBUG = os.getenv(
-    "DEBUG",
-    True,
-)
-USE_TZ = os.getenv(
-    "USE_TZ",
-    True,
-)
-USE_I18N = os.getenv(
-    "USE_I18N",
-    True,
-)
-TIME_ZONE = os.getenv(
-    "TIME_ZONE",
-    "UTC",
-)
-LANGUAGE_CODE = os.getenv(
-    "LANGUAGE_CODE",
-    "en-us",
-)
-TIME_ZONE = os.getenv(
-    "TIME_ZONE",
-    "Asia/Kolkata",
-)
+# Base settings
+DEBUG = True
+USE_TZ = True
+USE_I18N = True
+TIME_ZONE = "UTC"
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "Asia/Kolkata"
+AUTH_USER_MODEL = "app.User"
 
 
 ##
@@ -63,23 +47,21 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "saas_project.app",
+    "corsheaders",
+    "app",
 ]
 
 
 ## Middleware
 MIDDLEWARE = [
-    "whitenoise.middleware.WhiteNoiseMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "simple_history.middleware.HistoryRequestMiddleware",
-    "saas_project.app.middlewares.auth.CustomRequestMiddleware",
 ]
 
 
@@ -99,31 +81,6 @@ TEMPLATES = [
         },
     },
 ]
-
-
-## Celery settings
-BROKER_URL = "{schema}://{username}:{password}@{host}:{port}//".format(
-    schema=os.getenv(
-        "RABBITMQ_SCHEMA",
-        "amqp",
-    ),
-    username=os.getenv(
-        "RABBITMQ_USERNAME",
-        "guest",
-    ),
-    password=os.getenv(
-        "RABBITMQ_PASSWORD",
-        "guest",
-    ),
-    host=os.getenv(
-        "RABBITMQ_HOST",
-        "rabbitmq",
-    ),
-    port=os.getenv(
-        "RABBITMQ_PORT",
-        5672,
-    ),
-)
 
 
 ## Database
@@ -154,14 +111,31 @@ DATABASES = {
 }
 
 
-## Rest Framework
+# REST Framework
 REST_FRAMEWORK = {
-    "PAGE_SIZE": 50,
-    "DEFAULT_RENDERER_CLASSES": [
-        "rest_framework.renderers.JSONRenderer",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
     ],
-    "DEFAULT_PARSER_CLASSES": [
-        "rest_framework.parsers.JSONParser",
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
 }
+
+
+# Password validation
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
+]
