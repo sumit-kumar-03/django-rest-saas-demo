@@ -1,124 +1,89 @@
 # django-rest-saas-demo
 
 
-## SETUP INSTRUCTIONS:
+# 🧾 SaaS Subscription Billing Backend
 
-1. Create virtual environment:
-   python -m venv venv
-   source venv/bin/activate 
+This is a backend service for managing user subscriptions, automated invoicing, and payment workflows for a SaaS platform. Built using **Django**, **Celery**, and optional **Stripe** integration.
 
-2. Install dependencies:
-   pip install -r requirements.txt
 
-3. Create .env file with your configuration:
-   ```DEBUG=True
-   SECRET_KEY=your-secret-key-here
-   STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
-   STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
-   ```
+## 🚀 Features
 
-4. Run migrations:
-   python manage.py makemigrations app
-   python manage.py migrate
+- 🔐 User registration, login, logout, and profile
+- 💳 Plan subscription (Basic, Pro, Enterprise)
+- 📆 Automatic monthly invoice generation via Celery
+- ⚠️ Overdue invoice detection and payment reminders
+- 💰 Mock and Stripe-based payment processing
+- 📊 Billing dashboard & admin interface
+- ✅ RESTful API design with UUID-based model security
 
-5. Create superuser:
-   python manage.py createsuperuser
+---
 
-6. Load initial data (plans):
-   ```python manage.py shell
-   >>> from app.billing.models import Plan
-   >>> Plan.objects.create(name="Basic", plan_type="basic", price=9.99, features=["Feature 1", "Feature 2"])
-   >>> Plan.objects.create(name="Pro", plan_type="pro", price=19.99, features=["All Basic features", "Feature 3", "Feature 4"])
-   >>> Plan.objects.create(name="Enterprise", plan_type="enterprise", price=49.99, features=["All Pro features", "Feature 5", "Premium support"])
-   ```
+## 🧑‍💻 Quick Start (Recommended)
 
-7. Start RabbitMQ server:
+> 💡 **Fastest way to get started:**
 
-8. Start Celery worker:
+Just run:
 
-9. Start Celery beat (scheduler):
+```bash
+sudo docker compose up -d
+````
 
-10. Run Django server:
-    python manage.py runserver
+This will:
 
-## API ENDPOINTS:
+* Start Django, Celery, RabbitMQ, and Postgres
+* Set up environment variables
+* Apply migrations
+* Seed initial data (plans)
+* Expose the API at: `http://localhost:8000`
 
-### Authentication:
-- POST /api/users/register/ - Register new user
-- POST /api/users/login/ - Login user
-- POST /api/users/logout/ - Logout user
-- GET /api/users/profile/ - Get user profile
 
-### Plans:
-- GET /api/billing/plans/ - List all plans
 
-### Subscriptions:
-- GET /api/billing/subscriptions/ - List user subscriptions
-- POST /api/billing/subscribe/ - Subscribe to plan
-- POST /api/billing/subscriptions/{id}/cancel/ - Cancel subscription
+## 🔗 API Endpoints
 
-### Invoices:
-- GET /api/billing/invoices/ - List user invoices
-- GET /api/billing/invoices/{id}/ - Get invoice details
-- POST /api/billing/invoices/{id}/pay/ - Pay invoice (mock)
-- POST /api/billing/invoices/{id}/stripe-payment/ - Create Stripe payment intent
+### 👤 Authentication
 
-### Dashboard:
-- GET /api/billing/dashboard/ - Get billing dashboard data
+* `POST /api/users/register/`
+* `POST /api/users/login/`
+* `POST /api/users/logout/`
+* `GET  /api/users/profile/`
 
-## TESTING:
+### 📦 Plans
 
-1. Register a user:
-   curl -X POST http://localhost:8000/api/users/register/ \
-   -H "Content-Type: application/json" \
-   -d '{"email": "test@example.com", "username": "testuser", "password": "testpass123", "password_confirm": "testpass123"}'
+* `GET /api/billing/plans/`
 
-2. Login:
-   curl -X POST http://localhost:8000/api/users/login/ \
-   -H "Content-Type: application/json" \
-   -d '{"email": "test@example.com", "password": "testpass123"}'
+### 🔁 Subscriptions
 
-3. Get plans:
-   curl -X GET http://localhost:8000/api/billing/plans/
+* `GET /api/billing/subscriptions/`
+* `POST /api/billing/subscribe/`
+* `POST /api/billing/subscriptions/{id}/cancel/`
 
-4. Subscribe to plan:
-   curl -X POST http://localhost:8000/api/billing/subscribe/ \
-   -H "Content-Type: application/json" \
-   -H "Cookie: sessionid=your-session-id" \
-   -d '{"plan": "plan-uuid-here"}'
+### 💸 Invoices
 
-## CELERY TASKS:
+* `GET /api/billing/invoices/`
+* `GET /api/billing/invoices/{id}/`
+* `POST /api/billing/invoices/{id}/pay/`
+* `POST /api/billing/invoices/{id}/stripe-payment/`
 
-The following tasks run automatically:
-- generate_invoices_for_active_subscriptions: Daily at midnight
-- mark_overdue_invoices: Daily at 1 AM
-- send_payment_reminders: Daily at 9 AM
+### 📊 Dashboard
 
-You can also run tasks manually:
-celery -A subscription_billing call billing.tasks.generate_invoices_for_active_subscriptions
-celery -A subscription_billing call billing.tasks.mark_overdue_invoices
-celery -A subscription_billing call billing.tasks.send_payment_reminders
+* `GET /api/billing/dashboard/`
 
-## FEATURES IMPLEMENTED:
+---
 
-- ✅ User authentication and management
-- ✅ Plan management (Basic, Pro, Enterprise)
-- ✅ Subscription lifecycle (subscribe, cancel, expire)
-- ✅ Automatic invoice generation with Celery
-- ✅ Payment processing (mock and Stripe integration)
-- ✅ Overdue invoice detection
-- ✅ Payment reminder system
-- ✅ REST API endpoints
-- ✅ Admin interface
-- ✅ Billing dashboard
-- ✅ Webhook handling for Stripe events
-- ✅ Comprehensive error handling
-- ✅ Logging and monitoring
+## 🧪 Testing
 
-## BONUS FEATURES:
-- ✅ Email reminders (mock implementation)
-- ✅ Stripe integration for real payments
-- ✅ Webhook handling for payment events
-- ✅ Dashboard with billing overview
-- ✅ UUID-based model IDs for security
-- ✅ Comprehensive admin interface
+```bash
+# Register a user
+curl -X POST http://localhost:8000/api/users/register/ \
+-H "Content-Type: application/json" \
+-d '{"email": "test@example.com", "username": "testuser", "password": "testpass123", "password_confirm": "testpass123"}'
+
+# Login
+curl -X POST http://localhost:8000/api/users/login/ \
+-H "Content-Type: application/json" \
+-d '{"email": "test@example.com", "password": "testpass123"}'
+
+# List plans
+curl -X GET http://localhost:8000/api/billing/plans/
+```
+
