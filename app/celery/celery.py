@@ -3,6 +3,8 @@ from celery import Celery
 from app.logger import logger
 
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "saas_project.settings")
+
 BROKER_URL = "{schema}://{username}:{password}@{host}:{port}//".format(
     schema=os.getenv(
         "RABBITMQ_SCHEMA",
@@ -18,7 +20,7 @@ BROKER_URL = "{schema}://{username}:{password}@{host}:{port}//".format(
     ),
     host=os.getenv(
         "RABBITMQ_HOST",
-        "rabbitmq",
+        "saas_mq",
     ),
     port=os.getenv(
         "RABBITMQ_PORT",
